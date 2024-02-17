@@ -60,8 +60,14 @@ jsonStream.on('data', function(data) {
   for(var i = 0; i < data.publicKeys.length; i++) {
     var pubKey = data.publicKeys[i];
     if(data.signatures[pubKey]) {
-      var signature = bitcoreLibs.BTC.crypto.Signature.fromCompact(new Buffer(data.signatures[pubKey], 'base64'));
-      var verified = bitcoreLibs.BTC.Message(message)._verify(new bitcoreLibs.BTC.PublicKey(pubKey), signature);
+      let signature;
+      let verified
+      try {
+        signature = bitcoreLibs.BTC.crypto.Signature.fromCompact(new Buffer(data.signatures[pubKey], 'base64'));
+        verified = bitcoreLibs.BTC.Message(message)._verify(new bitcoreLibs.BTC.PublicKey(pubKey), signature);
+      } catch (e) {
+        console.log('Bad signature for pubKey', pubKey);
+      }
       if(verified) {
         validSignatures++;
       } else {
